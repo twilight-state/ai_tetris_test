@@ -23,7 +23,7 @@ Full Vision 1개 순으로 설계·구현한다.
 | # | System Name | Category | Priority | Status | Design Doc | Depends On |
 |---|-------------|----------|----------|--------|------------|------------|
 | 1 | 게임 보드 | Core | MVP | Designed | design/gdd/game-board.md | — |
-| 2 | 입력 시스템 | Core | MVP | Not Started | — | — |
+| 2 | 입력 시스템 | Core | MVP | Approved | design/gdd/input-system.md | — |
 | 3 | 씬 관리자 | Core | MVP | Not Started | — | — |
 | 4 | 테트리스 코어 | Gameplay | MVP | Not Started | — | 입력 시스템, 게임 보드 |
 | 5 | 미션 조건 시스템 | Gameplay | MVP | Not Started | — | 테트리스 코어, 게임 보드 |
@@ -147,10 +147,10 @@ Full Vision 1개 순으로 설계·구현한다.
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 14 |
-| Design docs started | 1 |
-| Design docs reviewed | 0 |
-| Design docs approved | 0 |
-| MVP systems designed | 1 / 7 |
+| Design docs started | 2 |
+| Design docs reviewed | 2 |
+| Design docs approved | 2 |
+| MVP systems designed | 2 / 7 |
 | Vertical Slice systems designed | 0 / 3 |
 
 ---
