@@ -1,0 +1,17 @@
+# Session state (ephemeral — do not commit)
+production/session-state/active.md
+
+# Session logs (local audit trail)
+production/session-logs/
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Godot
+.godot/
+*.import
+export_presets.cfg
