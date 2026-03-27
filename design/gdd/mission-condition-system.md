@@ -1,6 +1,6 @@
 # 미션 조건 시스템 (Mission Condition System)
 
-> **Status**: In Design
+> **Status**: Designed
 > **Author**: Luna/Solar Eclipse + Claude
 > **Last Updated**: 2026-03-28
 > **Implements Pillar**: 매 스테이지가 새로운 퍼즐 (이 시스템이 "새로운 퍼즐"을 정의)
@@ -173,20 +173,73 @@ on line_cleared(count) (TIME_LIMIT 타입):
 
 ## Tuning Knobs
 
-[To be designed]
+| 파라미터 | 현재 값 | 안전 범위 | 높이면 | 낮추면 |
+|---------|--------|---------|--------|--------|
+| `LINE_CLEAR.target` | 스테이지별 (예: 5~20줄) | 1 ~ 40 | 더 긴 플레이, 난이도 증가 | 너무 쉬워 긴장감 없음 |
+| `SCORE.target` | 스테이지별 (예: 500~5000점) | 100 ~ 10000 | 고급 클리어 전략 요구 (테트리스!) | 1줄 클리어 몇 번으로 달성 가능 |
+| `TIME_LIMIT.time_limit` | 스테이지별 (예: 60~120초) | 10.0 ~ 300.0 | 여유 있는 플레이 | 극도의 압박감, 클리어 불가 수준 |
+| `TIME_LIMIT.target` (줄 수) | 스테이지별 (예: 5~15줄) | 1 ~ 30 | 시간 대비 더 많은 클리어 필요 | 시간이 남아 긴장감 없음 |
+| `score_table[1]` | 100 | 50 ~ 200 | 1줄 클리어의 가치 높아짐 | 1줄로 점수 달성 어려워짐 |
+| `score_table[4]` (Tetris) | 800 | 400 ~ 1600 | 테트리스 전략 가치 극대화 | 테트리스보다 다줄 클리어가 더 효율적 |
+
+> **스테이지 조건 데이터**: 모든 스테이지별 `target`, `time_limit` 값은 외부 JSON/Resource로 관리. 코드 수정 없이 밸런스 조정 가능.
+>
+> **연동 주의**: `TIME_LIMIT.time_limit`과 테트리스 코어의 `fall_interval` (스테이지별)을 함께 조율해야 한다. 빠른 낙하 속도 스테이지에서는 `time_limit`을 넉넉히 설정.
 
 ## Visual/Audio Requirements
 
-[To be designed]
+| 이벤트 | 시각 피드백 | 오디오 피드백 | 우선순위 |
+|--------|-----------|-------------|---------|
+| 미션 달성 (`mission_complete`) | 화면 전체 플래시 + "CLEAR!" 텍스트 | 클리어 팡파레 | High |
+| 미션 실패 (`mission_failed`) | 화면 어둡게 + "FAILED" 텍스트 | 실패음 | High |
+| TIME_LIMIT 잔여 5초 이하 | 타이머 빨간색으로 변환 + 깜박임 | 카운트다운 비프음 | High |
+| 진행도 갱신 | HUD 진행도 바 애니메이션 | 없음 (MVP) | Medium |
 
 ## UI Requirements
 
-[To be designed]
+| 정보 | 표시 위치 | 갱신 주기 | 조건 |
+|------|---------|---------|------|
+| 미션 조건 설명 | 보드 상단 또는 좌측 | 스테이지 시작 시 1회 | Active 상태 |
+| 진행도 (current / target) | 보드 측면 HUD | `progress_updated` 수신 시 | Active 상태 |
+| 남은 시간 | 보드 상단 (TIME_LIMIT 전용) | `time_updated` 수신 시 | TIME_LIMIT 타입 + Active 상태 |
+| 잔여 5초 경고 | 타이머 색상 빨간색 + 깜박임 | 5초 미만 시 | TIME_LIMIT 타입 |
 
 ## Acceptance Criteria
 
-[To be designed]
+**LINE_CLEAR 조건**
+- [ ] `line_cleared(3)` 수신 시 `current_lines`가 3 증가한다
+- [ ] `current_lines >= target` 달성 시 `mission_complete` 시그널이 1회 발신된다
+- [ ] `progress_updated(current, target)` 시그널이 라인 클리어마다 발신된다
+- [ ] 목표 초과 달성 시에도 `mission_complete`가 정상 발신된다
+
+**SCORE 조건**
+- [ ] 1줄 클리어 시 점수 100이 누적된다
+- [ ] 4줄 동시 클리어 시 점수 800이 누적된다
+- [ ] `current_score >= target` 달성 시 `mission_complete` 시그널이 1회 발신된다
+
+**TIME_LIMIT 조건**
+- [ ] `activate()` 시 `remaining_time = time_limit`으로 초기화된다
+- [ ] 매 프레임 `remaining_time`이 감소하고 `time_updated` 시그널이 발신된다
+- [ ] 줄 수 목표 달성 시 타이머가 남아있어도 `mission_complete`가 발신된다
+- [ ] 타이머 만료 시 `mission_failed` 시그널이 발신된다
+- [ ] 일시정지 중 `remaining_time`이 감소하지 않는다
+
+**공통 동작**
+- [ ] `load_mission()` 없이 `activate()` 호출 시 활성화되지 않는다
+- [ ] Active 중 `load_mission()` 재호출 시 진행도가 완전 리셋된다
+- [ ] Complete 상태 후 추가 `line_cleared` 시그널이 와도 `mission_complete`가 재발신되지 않는다
+- [ ] `deactivate()` 후 들어오는 시그널은 모두 무시된다
+- [ ] 같은 프레임에 달성과 실패가 동시 발생하면 `mission_complete`가 우선 발신된다
+
+**데이터**
+- [ ] `score_table`, `target`, `time_limit` 값이 코드에 하드코딩되지 않고 외부 데이터에서 로드된다
+- [ ] 미션 조건 판정 로직이 프레임당 0.1ms 이내에 완료된다
 
 ## Open Questions
 
-[To be designed]
+| 질문 | 담당 | 해결 시점 |
+|------|------|---------|
+| Alpha 이후 추가할 조건 타입은 무엇인가? (예: PIECE_LIMIT, HARD_DROP_COUNT) | 밸런스 검토 시 | Vertical Slice 완료 후 |
+| TIME_LIMIT + SCORE 콤보 조건이 필요한가? (N점을 T초 내에) | 미션 데이터 구조 확장 시 결정 | Alpha 단계 |
+| 미션 실패(`mission_failed`) 시 즉시 게임 오버인가, 재도전 화면으로 가는가? | 씬 관리자 GDD에서 결정 | 게임 오버 화면 설계 시 |
+| 스테이지별 MissionData JSON 구조 확정 | 구현 시작 전 | 구현 단계 |

@@ -26,7 +26,7 @@ Full Vision 1개 순으로 설계·구현한다.
 | 2 | 입력 시스템 | Core | MVP | Approved | design/gdd/input-system.md | — |
 | 3 | 씬 관리자 | Core | MVP | Designed | design/gdd/scene-manager.md | — |
 | 4 | 테트리스 코어 | Gameplay | MVP | Designed | design/gdd/tetris-core.md | 입력 시스템, 게임 보드 |
-| 5 | 미션 조건 시스템 | Gameplay | MVP | Not Started | — | 테트리스 코어, 게임 보드 |
+| 5 | 미션 조건 시스템 | Gameplay | MVP | Designed | design/gdd/mission-condition-system.md | 테트리스 코어, 게임 보드 |
 | 6 | 게임 HUD | UI | MVP | Not Started | — | 테트리스 코어, 미션 조건 시스템, 스킬 시스템 |
 | 7 | 게임 오버 화면 | UI | MVP | Not Started | — | 씬 관리자, 테트리스 코어 |
 | 8 | 캠페인/해금 시스템 | Progression | Vertical Slice | Not Started | — | 미션 조건 시스템 |
@@ -147,10 +147,10 @@ Full Vision 1개 순으로 설계·구현한다.
 | Metric | Count |
 |--------|-------|
 | Total systems identified | 14 |
-| Design docs started | 4 |
+| Design docs started | 5 |
 | Design docs reviewed | 2 |
 | Design docs approved | 2 |
-| MVP systems designed | 4 / 7 |
+| MVP systems designed | 5 / 7 |
 | Vertical Slice systems designed | 0 / 3 |
 
 ---
